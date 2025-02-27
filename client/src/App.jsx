@@ -1,9 +1,7 @@
 import "./App.css";
 import Landing from "./pages/Landing";
-import SignUp from "./pages/SignUp";
 import { Route, Routes } from "react-router-dom";
 import { useEffect, useMemo, useLayoutEffect } from "react";
-import MovieDetails from "./pages/MovieShowTime";
 import Record from "./pages/Record";
 import ClientDocuments from "./pages/ClientDocuments";
 
