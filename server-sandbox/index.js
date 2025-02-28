@@ -15,7 +15,7 @@ app.get("/patients", (req, res) => {
 
 app.get("/patient/:patientId", (req, res) => {
   const mockDocuments = [
-    { id: 1, type: "Transcription", createdTime: "2024-02-27 12:00:00" },
+    { id: 1, type: "Transcript", createdTime: "2024-02-27 12:00:00" },
     { id: 2, type: "Summary", createdTime: "2024-02-27 12:30:00" },
     { id: 3, type: "HeadToToe", createdTime: "2024-02-27 13:00:00" },
     { id: 4, type: "DARP", createdTime: "2024-02-27 14:00:00" },
@@ -23,55 +23,51 @@ app.get("/patient/:patientId", (req, res) => {
   res.json(mockDocuments);
 });
 
-app.get("/document/1", (req, res) => {
+app.get("/transcript/1", (req, res) => {
   res.json({
-    patientId: 1,
+    patientName: "Loryn Sand",
     createdTime: "2024-02-27 12:00:00",
-    type: "transcription",
-    body: "This is a transcription text.",
+    body: "This is a transcript text.",
   });
 });
 
-app.get("/document/2", (req, res) => {
+app.get("/summary/1", (req, res) => {
   res.json({
-    patientId: 1,
+    patientName: "Jae",
     createdTime: "2024-02-27 12:30:00",
-    type: "summary",
     body: "This is a summary text.",
   });
 });
 
-app.get("/document/3", (req, res) => {
+app.get("/head-to-toe/1", (req, res) => {
   res.json({
-    patientId: 1,
+    patientName: "Loryn Sand",
     createdTime: "2024-02-27 13:00:00",
-    type: "HeadToToe",
     body: {
-      Neurological: "Normal",
+      neurological: "Normal",
       HEENT: "No abnormalities",
-      Respiratory: "Clear breath sounds",
-      Cardiac: "Regular heart rate and rhythm",
-      Peripheral_Vascular: "No edema",
-      Integumentary: "Intact skin",
-      Musculoskeletal: "Full range of motion",
-      Gastrointestinal: "Normal bowel sounds",
-      Genitourinary: "No abnormalities",
-      Sleep_Rest: "Adequate",
-      Psychosocial: "No distress",
+      respiratory: "Clear breath sounds",
+      cardiac: "Regular heart rate and rhythm",
+      peripheral_Vascular: "No edema",
+      integumentary: "Intact skin",
+      musculoskeletal: "Full range of motion",
+      gastrointestinal: "Normal bowel sounds",
+      genitourinary: "No abnormalities",
+      sleep_Rest: "Adequate",
+      psychosocial: "No distress",
     },
   });
 });
 
-app.get("/document/4", (req, res) => {
+app.get("/DARP/1", (req, res) => {
   res.json({
-    patientId: 1,
+    patientName: "Loryn Sand",
     createdTime: "2024-02-27 14:00:00",
-    type: "DARP",
     body: {
-      Data: "Patient reported pain",
-      Action: "Administered medication",
-      Response: "Pain relief observed",
-      Plan: "Monitor pain levels",
+      data: "Patient reported pain",
+      action: "Administered medication",
+      response: "Pain relief observed",
+      plan: "Monitor pain levels",
     },
   });
 });

@@ -16,13 +16,11 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': {
-        target: 'http://localhost:3000', // The target server
+      "/api": {
+        target: "http://localhost:8080", // The target server
         changeOrigin: true, // Set this to true if you need to change the origin
-        rewrite: path => path.replace(/^\/api/, ''), // Remove the base path from the request URL
+        rewrite: (path) => path.replace(/^\/api/, ""), // Remove the base path from the request URL
       },
     },
   },
-  
 });
-

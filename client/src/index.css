@@ -16,25 +16,34 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 100%; /* Change background to white */
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    --radius: 0.5rem;
+    --background: 0 0% 100%; /* White background */
+    --foreground: 0 0% 10%; /* Dark gray text */
+
+    --card: 0 0% 95%; /* Light gray card background */
+    --card-foreground: 0 0% 10%; /* Dark gray text */
+
+    --popover: 0 0% 95%; /* Light gray popovers */
+    --popover-foreground: 0 0% 10%;
+
+    --primary: 0 0% 40%; /* Medium gray primary */
+    --primary-foreground: 0 0% 100%; /* White text on primary */
+
+    --secondary: 0 0% 85%; /* Light gray secondary */
+    --secondary-foreground: 0 0% 15%; /* Darker text */
+
+    --muted: 0 0% 90%; /* Very light gray */
+    --muted-foreground: 0 0% 30%; /* Medium-dark gray */
+
+    --accent: 0 0% 60%; /* Neutral gray accent */
+    --accent-foreground: 0 0% 10%; /* Dark text on accent */
+
+    --destructive: 0 100% 50%; /* Bright red */
+    --destructive-foreground: 0 0% 100%; /* White text */
+
+    --border: 0 0% 80%; /* Light gray borders */
+    --input: 0 0% 85%; /* Light gray inputs */
+    --ring: 0 0% 50%; /* Medium gray focus ring */
+
+    --radius: 0.5rem; /* Keep rounded corners */
   }
 }

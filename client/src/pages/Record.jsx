@@ -6,8 +6,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import "./Record.css";
 
-
-
 function Record(){
   const [selectedPatient, setSelectedPatient] = useState("Patient A");
   const [consentGiven, setConsentGiven] = useState(false);
@@ -60,32 +58,33 @@ function Record(){
   };
 
   return (
-    <div className="record-container">
-      <div className="record-box">
-        <label>Patient</label>
-        <select value={selectedPatient} onChange={(e) => setSelectedPatient(e.target.value)}>
-          <option value="Patient A">Patient A</option>
-          <option value="Patient B">Patient B</option>
-          <option value="Patient C">Patient C</option>
-        </select>
-  
-        <div className="checkbox-container">
-          <input type="checkbox" checked={consentGiven} onChange={(e) => setConsentGiven(e.target.checked)} />
-          <label>Consent</label>
+    <div className="w-[375px] h-[667px] rounded-3xl border border-gray-200 bg-zinc-50  p-4 text-gray-900 overflow-hidden flex flex-col">
+      <div className="record-container">
+        <div className="record-box">
+          <label>Patient</label>
+          <select value={selectedPatient} onChange={(e) => setSelectedPatient(e.target.value)}>
+            <option value="Patient A">Patient A</option>
+            <option value="Patient B">Patient B</option>
+            <option value="Patient C">Patient C</option>
+          </select>
+
+          <div className="checkbox-container">
+            <input type="checkbox" checked={consentGiven} onChange={(e) => setConsentGiven(e.target.checked)} />
+            <label>Consent</label>
+          </div>
+
+          <button
+            onClick={recording ? stopRecording : startRecording}
+            className={`record-button ${recording ? "recording" : ""}`}
+          ></button>
+
+          {audioURL && (
+            <audio src={audioURL} controls className="audio-player"></audio>
+          )}
         </div>
-  
-        <button
-          onClick={recording ? stopRecording : startRecording}
-          className={`record-button ${recording ? "recording" : ""}`}
-        ></button>
-  
-        {audioURL && (
-          <audio src={audioURL} controls className="audio-player"></audio>
-        )}
       </div>
     </div>
   );  
 };
 
 export default Record;
-
