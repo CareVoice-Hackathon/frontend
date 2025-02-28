@@ -15,6 +15,8 @@
   border-radius: 10px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   width: 300px;
+  align-items: right;
+  justify-content: right;
   text-align: center;
 }
 
@@ -23,7 +25,19 @@
   display: block;
   font-size: 16px;
   margin-bottom: 5px;
+  align-items: center;
   text-align: left;
+}
+
+.recording-visualizer,
+.playback-waveform {
+  width: 220px;
+  height: 80px;
+  display: block;
+  margin: 10px auto 0; /* center horizontally */
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 /* Dropdown */
@@ -59,6 +73,7 @@
   color: white;
   display: flex;
   align-items: center;
+  position: relative;
   justify-content: center;
   border: none;
   font-size: 24px;
@@ -68,6 +83,7 @@
 
 .record-button:hover {
   background-color: #0056b3;
+  opacity: 0.9;
 }
 
 /* Recording active */
@@ -78,15 +94,26 @@
 /* Play Icon */
 .record-button::before {
   content: "▶";
+  position: absolute;
+  top: 53%;
+  left: 53%;
+  transform: translate(-50%, -50%);
+  line-height: 1;   /* Ensures the icon doesn’t shift vertically */
 }
 
 /* When recording */
 .record-button.recording::before {
-  content: "■"; /* Stop symbol */
+  content: "■";
+  position: absolute;
+  top: 49%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  line-height: 1; 
 }
 
 /* Audio Player */
 .audio-player {
   margin-top: 20px;
+  margin-bottom: 15px;
   width: 100%;
 }
