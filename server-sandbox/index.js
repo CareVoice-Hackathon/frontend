@@ -15,7 +15,7 @@ app.get("/patients", (req, res) => {
 
 app.get("/patient/:patientId", (req, res) => {
   const mockDocuments = [
-    { id: 1, type: "Transcription", createdTime: "2024-02-27 12:00:00" },
+    { id: 1, type: "Transcript", createdTime: "2024-02-27 12:00:00" },
     { id: 2, type: "Summary", createdTime: "2024-02-27 12:30:00" },
     { id: 3, type: "HeadToToe", createdTime: "2024-02-27 13:00:00" },
     { id: 4, type: "DARP", createdTime: "2024-02-27 14:00:00" },
@@ -27,7 +27,7 @@ app.get("/transcript/1", (req, res) => {
   res.json({
     patientName: "Loryn Sand",
     createdTime: "2024-02-27 12:00:00",
-    body: "This is a transcription text.",
+    body: "This is a transcript text.",
   });
 });
 

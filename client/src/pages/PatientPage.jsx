@@ -1,56 +1,85 @@
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import BatchGenerationForm from "@/components/batch-generation-form";
-import { useState } from "react";
 
-export default function PatientPage({ patientId }) {
-  const documents = [
-    { id: 1, type: "DARP", timestamp: "2025/01/02 14:01" },
-    { id: 2, type: "Head to Toe Assessment", timestamp: "2025/01/02 14:01" },
-    { id: 3, type: "Summary", timestamp: "2025/01/02 14:01" },
-    { id: 4, type: "Transcript", timestamp: "2025/01/02 14:01" },
-    { id: 5, type: "Transcript", timestamp: "2025/01/02 14:01" },
-  ];
+export default function PatientPage() {
+  const { patientId } = useParams();
+  const [documents, setDocuments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Fetch documents for the patient from the API
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        const response = await fetch(`/api/patient/${patientId}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch patient documents.");
+        }
+        let data = await response.json();
+
+        data.sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime)); // Sort documents by createdTime (newest first)
+        setDocuments(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDocuments();
+  }, []);
+
+  // Filter transcripts for batch processing
   const transcripts = documents.filter((doc) => doc.type === "Transcript");
 
-  // Function to determine the route based on document type
+  // Map document types to their corresponding routes
   const getDocumentRoute = (type, id) => {
     const typeMap = {
-      DARP: "darp",
-      "Head to Toe Assessment": "head-to-toe",
+      Transcript: "Transcript",
       Summary: "summary",
-      Transcription: "transcript",
+      HeadToToe: "head-to-toe",
+      DARP: "darp",
     };
-    const route = typeMap[type] || "document"; // Fallback to generic document route
+    const route = typeMap[type] || "NA"; // Fallback to transcript
     return `/${route}/${encodeURIComponent(id)}`;
   };
 
   return (
     <div className="w-[375px] h-[667px] rounded-3xl border border-gray-200 bg-zinc-50 p-4 overflow-hidden flex flex-col">
       <div className="mb-6">
-        <h1 className="font-handwriting text-4xl">Patient A</h1>
+        <h1 className="font-handwriting text-4xl">Patient {patientId}</h1>
       </div>
 
       <div className="flex flex-col">
         <h2 className="font-handwriting text-2xl mb-4 self-center">
           Documents
         </h2>
-        <div className="space-y-4 pl-2">
-          {documents.map((doc) => (
-            <Link
-              to={getDocumentRoute(doc.type, doc.id)}
-              key={doc.id}
-              className="flex justify-between items-baseline"
-            >
-              <span className="font-handwriting text-xl">{doc.type}</span>
-              <span className="text-sm text-gray-400">{doc.timestamp}</span>
-            </Link>
-          ))}
-        </div>
+
+        {isLoading ? (
+          <p className="text-gray-600 text-center">Loading documents...</p>
+        ) : error ? (
+          <p className="text-red-500 text-center">{error}</p>
+        ) : (
+          <div className="space-y-4 pl-2">
+            {documents.map((doc) => (
+              <Link
+                to={getDocumentRoute(doc.type, doc.id)}
+                key={doc.id}
+                className="group cursor-pointer mb-2"
+              >
+                <div className="font-handwriting text-xl">{doc.type}</div>
+                <div className="text-sm text-gray-400">{doc.createdTime}</div>
+                <div className="mb-4 h-0.5 w-0 bg-zinc-500 transition-all duration-300 group-hover:w-full"></div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
-      <div className="pt-3 mt-auto ">
+
+      <div className="pt-3 mt-auto">
         <Button
           variant="outline"
           className="w-full rounded-md py-3 text-base"
@@ -60,11 +89,14 @@ export default function PatientPage({ patientId }) {
         </Button>
       </div>
 
-      <BatchGenerationForm
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        transcripts={transcripts}
-      />
+      {/* Render modal only when isModalOpen is true */}
+      {isModalOpen && (
+        <BatchGenerationForm
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          transcripts={transcripts}
+        />
+      )}
     </div>
   );
 }

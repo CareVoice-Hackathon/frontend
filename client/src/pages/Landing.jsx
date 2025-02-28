@@ -1,41 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import AddPatientDialog from "@/components/AddPatientDialog";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function Landing() {
-  const [patients, setPatients] = useState([
-    { id: "1", name: "Patient A", healthNumber: "Alberta Health #: xxx-xxx" },
-    { id: "2", name: "Patient B", healthNumber: "Alberta Health #: xxx-xxx" },
-    { id: "3", name: "Patient D", healthNumber: "Alberta Health #: xxx-xxx" },
-    { id: "1", name: "Patient A", healthNumber: "Alberta Health #: xxx-xxx" },
-    { id: "2", name: "Patient B", healthNumber: "Alberta Health #: xxx-xxx" },
-    { id: "3", name: "Patient D", healthNumber: "Alberta Health #: xxx-xxx" },
-    { id: "1", name: "Patient A", healthNumber: "Alberta Health #: xxx-xxx" },
-    { id: "2", name: "Patient B", healthNumber: "Alberta Health #: xxx-xxx" },
-    { id: "3", name: "Patient D", healthNumber: "Alberta Health #: xxx-xxx" },
-    { id: "1", name: "Patient A", healthNumber: "Alberta Health #: xxx-xxx" },
-    { id: "2", name: "Patient B", healthNumber: "Alberta Health #: xxx-xxx" },
-    { id: "3", name: "Patient D", healthNumber: "Alberta Health #: xxx-xxx" },
-    { id: "1", name: "Patient A", healthNumber: "Alberta Health #: xxx-xxx" },
-    { id: "2", name: "Patient B", healthNumber: "Alberta Health #: xxx-xxx" },
-    { id: "3", name: "Patient D", healthNumber: "Alberta Health #: xxx-xxx" },
-  ]);
+  const [patients, setPatients] = useState([]);
   const [isAddingPatient, setIsAddingPatient] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const response = await fetch("/api/patients");
+        if (!response.ok) {
+          throw new Error("Failed to fetch patients");
+        }
+        const data = await response.json();
+        setPatients(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPatients();
+  }, []);
 
   const handleAddPatient = (patient) => {
-    setPatients([...patients, patient]);
+    setPatients((prev) => [...prev, { ...patient, id: prev.length + 1 }]);
     setIsAddingPatient(false);
   };
 
   return (
-    <div className="w-[375px] h-[667px] rounded-3xl border border-gray-200  bg-zinc-50  p-4 text-gray-900 overflow-hidden flex flex-col">
-      <div className="mb-4  flex flex-row items-end">
-        <h1 className="mb-1 font-handwriting text-4xl">Welcome Loryn</h1>
+    <div className="w-[375px] h-[667px] rounded-3xl border border-gray-200 bg-zinc-50 p-4 text-gray-900 overflow-hidden flex flex-col">
+      <div className="mb-4">
+        <h1 className="font-handwriting text-4xl">Welcome, Loryn</h1>
       </div>
 
-      <div className="mb-2 flex items-end justify-between">
-        <h2 className="font-handwriting text-2xl ">Your patients</h2>
+      <div className="mb-2 flex items-center justify-between">
+        <h2 className="font-handwriting text-2xl">Your Patients</h2>
         <Button
           variant="outline"
           className="border-gray-400 text-gray-800 hover:bg-gray-100 text-sm px-2 py-1 h-6"
@@ -46,32 +51,36 @@ export default function Landing() {
       </div>
 
       <div className="flex-grow overflow-y-auto pl-4">
-        <div className="space-y-4">
-          {patients.map((patient) => (
-            <Link
-              to={`/patient/${encodeURIComponent(patient.id)}`}
-              key={patient.id}
-              className="group cursor-pointer"
-            >
-              <div className="mb-1 font-handwriting text-xl">
-                {patient.name}
-              </div>
-              <div className="text-xs text-gray-500">
-                {patient.healthNumber}
-              </div>
-              <div className="mt-1 h-0.5 w-0 bg-blue-500 transition-all duration-300 group-hover:w-full"></div>
-            </Link>
-          ))}
-        </div>
+        {isLoading ? (
+          <p className="text-gray-600">Loading patients...</p>
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
+        ) : (
+          <div className="space-y-4">
+            {patients.map((patient) => (
+              <Link
+                to={`/patient/${encodeURIComponent(patient.id)}`}
+                key={patient.id}
+                className="group block cursor-pointer"
+              >
+                <div className="font-handwriting text-xl">{patient.name}</div>
+                <div className="ml-2 text-xs text-gray-500">
+                  AHN: {patient.AHN}
+                </div>
+                <div className="h-0.5 w-0 bg-zinc-500 transition-all duration-300 group-hover:w-full"></div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="mt-4">
-        <Button
-          variant="outline"
-          className="w-full border-gray-400 py-2 text-base font-medium text-gray-800 "
+      <div className="mt-4 flex justify-center">
+        <Link
+          to={`/record`}
+          className="border border-zinc-700 rounded-md px-2 py-1"
         >
           Record Conversation
-        </Button>
+        </Link>
       </div>
 
       {isAddingPatient && (

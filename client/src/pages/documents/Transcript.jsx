@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
+import { useNavigate, Link, useParams } from "react-router-dom";
 import FormSelectionDialog from "@/components/FormSelectionDialog";
 
-export default function Document() {
+export default function Transcript() {
+  const { transcriptId } = useParams();
   const [body, setBody] = useState("");
   const [patientName, setPatientName] = useState("");
   const [createdTime, setCreatedTime] = useState("");
@@ -13,7 +15,7 @@ export default function Document() {
   useEffect(() => {
     const fetchDocument = async () => {
       try {
-        const response = await fetch(`/api/transcript/1`);
+        const response = await fetch(`/api/transcript/{transcriptId}`);
         if (!response.ok) {
           throw new Error("Failed to fetch document");
         }
@@ -33,7 +35,7 @@ export default function Document() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`/api/transcript/1`, {
+      const response = await fetch(`/api/transcript/{transcriptId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -76,14 +78,14 @@ export default function Document() {
 
       <div className="space-y-2">
         <>
+          <Button
+            variant="outline"
+            className="w-full border-gray-400 py-2 text-base font-medium text-gray-800 hover:bg-gray-100"
+            onClick={handleSave}
+          >
+            Save
+          </Button>
           <div className="grid grid-cols-2 gap-2">
-            <Button
-              variant="outline"
-              className="w-full border-gray-400 py-2 text-base font-medium text-gray-800 hover:bg-gray-100"
-              onClick={handleSave}
-            >
-              Save
-            </Button>
             <Button
               variant="outline"
               className="w-full border-gray-400 py-2 text-base font-medium text-gray-800 hover:bg-gray-100"
@@ -91,14 +93,14 @@ export default function Document() {
             >
               Summarize
             </Button>
+            <Button
+              variant="outline"
+              className="w-full border-gray-400 py-2 text-base font-medium text-gray-800 hover:bg-gray-100"
+              onClick={() => setShowFormSelection(true)}
+            >
+              Fill out Form
+            </Button>
           </div>
-          <Button
-            variant="outline"
-            className="w-full border-gray-400 py-2 text-base font-medium text-gray-800 hover:bg-gray-100"
-            onClick={() => setShowFormSelection(true)}
-          >
-            Fill out Form
-          </Button>
         </>
       </div>
 

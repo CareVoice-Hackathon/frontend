@@ -1,7 +1,6 @@
 import "./App.css";
 import Landing from "./pages/Landing";
 import { Route, Routes } from "react-router-dom";
-import { useEffect, useMemo, useLayoutEffect } from "react";
 import Record from "./pages/Record";
 import PatientPage from "./pages/PatientPage";
 import Transcript from "./pages/documents/Transcript";

@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
+import { useNavigate, Link, useParams } from "react-router-dom";
 import FormSelectionDialog from "@/components/FormSelectionDialog";
 
 export default function Summary() {
+  const { sumammaryId } = useParams();
   const [body, setBody] = useState("");
   const [createdTime, setCreatedTime] = useState("");
   const [patientName, setPatientName] = useState("");
@@ -13,7 +15,7 @@ export default function Summary() {
   useEffect(() => {
     const fetchDocument = async () => {
       try {
-        const response = await fetch(`/api/summary/1`);
+        const response = await fetch(`/api/summary/{sumammaryId}`);
         if (!response.ok) {
           throw new Error("Failed to fetch document");
         }
@@ -33,7 +35,7 @@ export default function Summary() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`/api/summary/1`, {
+      const response = await fetch(`/api/summary/{sumammaryId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

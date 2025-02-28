@@ -20,7 +20,7 @@ export default function BatchGenerationForm({ isOpen, onClose, transcripts }) {
       type: documentType,
       transcripts: selectedTranscripts,
     });
-    // Here you would typically call an API to generate the document
+    // TODO: implement  POST/convert-document
     onClose();
   };
 
@@ -53,7 +53,7 @@ export default function BatchGenerationForm({ isOpen, onClose, transcripts }) {
 
           <div>
             <h3 className="text-base mb-2">
-              Select transcripts you want to convert.
+              Select transcripts to generate from
             </h3>
             <div className="space-y-2">
               {transcripts.map((transcript, index) => (
@@ -62,11 +62,11 @@ export default function BatchGenerationForm({ isOpen, onClose, transcripts }) {
                     variant="outline"
                     id={`transcript-${index}`}
                     onCheckedChange={() =>
-                      handleTranscriptToggle(transcript.timestamp)
+                      handleTranscriptToggle(transcript.createdTime)
                     }
                   />
                   <Label htmlFor={`transcript-${index}`} className="text-sm">
-                    {transcript.timestamp}
+                    {transcript.createdTime}
                   </Label>
                 </div>
               ))}

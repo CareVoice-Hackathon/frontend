@@ -8,5 +8,7 @@ import { Label } from "@/components/ui/label";
 export default function Component() {
   const navigate = useNavigate();
 
-  return <div className="min-h-screen ">This is record page</div>;
+  return (
+    <div className="w-[375px] h-[667px] rounded-3xl border border-gray-200 bg-zinc-50  p-4 text-gray-900 overflow-hidden flex flex-col"></div>
+  );
 }
