@@ -1,23 +1,26 @@
 import "./App.css";
 import Landing from "./pages/Landing";
-import SignUp from "./pages/SignUp";
 import { Route, Routes } from "react-router-dom";
 import { useEffect, useMemo, useLayoutEffect } from "react";
-import MovieDetails from "./pages/MovieShowTime";
 import Record from "./pages/Record";
-import ClientDocuments from "./pages/ClientDocuments";
+import PatientPage from "./pages/PatientPage";
+import Transcript from "./pages/documents/Transcript";
+import Summary from "./pages/documents/Summary";
+import DARP from "./pages/documents/DARP";
+import HeadToToe from "./pages/documents/HeadToToe";
 
 function App() {
   return (
     <div className="AppWrapper  w-full flex flex-col flex-1 ">
-      <div className="RouteWrapper bg-zinc-50 flex flex-col w-full mr-0 flex-1 ">
+      <div className="RouteWrapper  flex flex-col w-full mr-0 flex-1 justify-center items-center bg-zinc-700">
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/record" element={<Record />} />
-          <Route
-            path="/client_documents/:clientId"
-            element={<ClientDocuments />}
-          />
+          <Route path="/patient/:patientId" element={<PatientPage />} />
+          <Route path="/transcript/:transcriptId" element={<Transcript />} />
+          <Route path="/summary/:summaryId" element={<Summary />} />
+          <Route path="/head-to-toe/:head-to-toeId" element={<HeadToToe />} />
+          <Route path="/DARP/:docId" element={<DARP />} />
         </Routes>
       </div>
     </div>
