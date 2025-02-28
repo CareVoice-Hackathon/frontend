@@ -182,7 +182,7 @@ const drawRecordingVisualizer = () => {
               checked={consentGiven}
               onChange={(e) => setConsentGiven(e.target.checked)}
             />
-            <label>Consent</label>
+            <label>I consent to my voice being recorded.</label>
           </div>
 
           <button
