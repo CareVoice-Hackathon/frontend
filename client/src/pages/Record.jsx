@@ -41,7 +41,7 @@ function Record(){
       formData.append("file", audioFile);
       formData.append("patient", selectedPatient);
 
-      await fetch("http://localhost:8080/transcript", {
+      await fetch("http://localhost:8080/api/transcript/transcribe", {
         method: "POST",
         body: formData,
       });
