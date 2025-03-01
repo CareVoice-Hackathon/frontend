@@ -5,6 +5,7 @@ import FormSelectionDialog from "@/components/FormSelectionDialog";
 
 export default function DARP() {
   const { DARP_id } = useParams();
+  const [patientId, setPatientId] = useState({});
   const [docType, setDocType] = useState("Summary");
   const [data, setData] = useState({});
   const [createdTime, setCreatedTime] = useState("");
@@ -18,14 +19,15 @@ export default function DARP() {
   useEffect(() => {
     const fetchDocument = async () => {
       try {
-        const response = await fetch(`/api/DARP/{DARP_id}`);
+        const response = await fetch(`/api/DARP/${DARP_id}`);
         if (!response.ok) {
           throw new Error("Failed to fetch document");
         }
         const data = await response.json();
-        setData(data.body);
-        setPatientName(data.patientName);
-        setCreatedTime(data.createdTime);
+        setPatientId(data.data.patientId);
+        setData(data.data.body);
+        setPatientName(data.data.patientName);
+        setCreatedTime(data.data.createdTime);
         setIsLoading(false);
       } catch (err) {
         setError(err.message);
@@ -38,7 +40,7 @@ export default function DARP() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`/api/DARP/{DARP_id}`, {
+      const response = await fetch(`/api/DARP/${DARP_id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
