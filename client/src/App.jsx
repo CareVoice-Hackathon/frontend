@@ -17,11 +17,11 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/record" element={<Record />} />
-          <Route path="/patient/:patientId" element={<PatientPage />} />
+          <Route path="/patient/:patientId" element={<PatientPage />} /> 
           <Route path="/transcript/:transcriptId" element={<Transcript />} />
           <Route path="/summary/:summaryId" element={<Summary />} />
           <Route path="/head-to-toe/:head_to_toeId" element={<HeadToToe />} />
-          <Route path="/DARP/:docId" element={<DARP />} />
+          <Route path="/DARP/:DARP_Id" element={<DARP />} />
         </Routes>
       </div>
     </div>

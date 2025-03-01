@@ -10,9 +10,37 @@ function Record(){
   const [selectedPatient, setSelectedPatient] = useState("Patient A");
   const [consentGiven, setConsentGiven] = useState(false);
   const [recording, setRecording] = useState(false);
+  const [patients, setPatients] = useState([]);
   const [audioURL, setAudioURL] = useState(null);
   const mediaRecorder = useRef(null);
   const audioChunks = useRef([]);
+
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const response = await fetch("/api/patients/1");
+        if (!response.ok) {
+          throw new Error("Failed to fetch patients");
+        }
+        const data = await response.json();
+        setPatients(data.data);
+        console.log(data.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPatients();
+  }, []);
+
+  const handleAddPatient = async () => {
+    setIsAddingPatient(false);
+    
+  };
+  
 
   // Refs for visualizers and animation
   const recordingCanvasRef = useRef(null);
@@ -133,6 +161,8 @@ const drawRecordingVisualizer = () => {
       formData.append("file", audioFile);
       formData.append("patient", selectedPatient);
 
+      await console.log(formData);
+
       await fetch("http://localhost:8080/api/transcript/transcribe", {
         method: "POST",
         body: formData,
@@ -171,10 +201,13 @@ const drawRecordingVisualizer = () => {
             value={selectedPatient}
             onChange={(e) => setSelectedPatient(e.target.value)}
           >
-            <option value="Patient A">Patient A</option>
-            <option value="Patient B">Patient B</option>
-            <option value="Patient C">Patient C</option>
+            {patients.map((patient, index) => (
+              <option key={index} value={patient.name}>
+                {patient.name}
+              </option>
+            ))}
           </select>
+
 
           <div className="checkbox-container">
             <label className="consent-text">I consent to my voice being recorded.</label>

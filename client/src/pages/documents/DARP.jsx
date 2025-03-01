@@ -4,7 +4,7 @@ import { useNavigate, Link, useParams } from "react-router-dom";
 import FormSelectionDialog from "@/components/FormSelectionDialog";
 
 export default function DARP() {
-  const { DARP_id } = useParams();
+  const { DARP_Id } = useParams();
   const [patientId, setPatientId] = useState({});
   const [docType, setDocType] = useState("Summary");
   const [data, setData] = useState({});
@@ -19,7 +19,8 @@ export default function DARP() {
   useEffect(() => {
     const fetchDocument = async () => {
       try {
-        const response = await fetch(`/api/DARP/${DARP_id}`);
+        console.log(DARP_Id)
+        const response = await fetch(`/api/DARP/${DARP_Id}`);
         if (!response.ok) {
           throw new Error("Failed to fetch document");
         }
@@ -40,7 +41,7 @@ export default function DARP() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`/api/DARP/${DARP_id}`, {
+      const response = await fetch(`/api/DARP/${DARP_Id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

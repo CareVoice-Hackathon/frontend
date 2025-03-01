@@ -29,10 +29,11 @@ export default function Landing() {
     fetchPatients();
   }, []);
 
-  const handleAddPatient = (patient) => {
-    setPatients((prev) => [...prev, { ...patient, id: prev.length + 1 }]);
+  const handleAddPatient = async () => {
     setIsAddingPatient(false);
+    
   };
+  
 
   return (
     <div className="w-[375px] h-[667px] rounded-3xl border border-gray-200 bg-zinc-50 p-4 text-gray-900 overflow-hidden flex flex-col">

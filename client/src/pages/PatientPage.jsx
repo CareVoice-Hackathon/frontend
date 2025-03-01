@@ -6,6 +6,7 @@ import BatchGenerationForm from "@/components/batch-generation-form";
 export default function PatientPage() {
   const { patientId } = useParams();
   const [documents, setDocuments] = useState([]);
+  const [patientName, setPatientName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,9 +20,12 @@ export default function PatientPage() {
           throw new Error("Failed to fetch patient documents.");
         }
         let data = await response.json();
-
-        data.sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime)); // Sort documents by createdTime (newest first)
-        setDocuments(data);
+        let innerData = data.data;
+        let documents = innerData.documents;
+        setPatientName(innerData.patientName);
+        documents.sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime)); // Sort documents by createdTime (newest first)
+        setDocuments(documents);
+        console.log(innerData)
       } catch (err) {
         setError(err.message);
       } finally {
@@ -50,14 +54,14 @@ export default function PatientPage() {
   return (
     <div className="w-[375px] h-[667px] rounded-3xl border border-gray-200 bg-zinc-50 p-4 overflow-hidden flex flex-col">
       <div className="mb-6">
-        <h1 className="font-handwriting text-4xl">Patient {patientId}</h1>
+        <h1 className="font-handwriting text-4xl">{patientName}</h1>
       </div>
 
-      <div className="flex flex-col">
         <h2 className="font-handwriting text-2xl mb-4 self-center">
           Documents
         </h2>
 
+      <div className="flex flex-col h-full overflow-auto">
         {isLoading ? (
           <p className="text-gray-600 text-center">Loading documents...</p>
         ) : error ? (
@@ -95,6 +99,7 @@ export default function PatientPage() {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           transcripts={transcripts}
+          patientId={patientId}
         />
       )}
     </div>

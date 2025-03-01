@@ -20,10 +20,11 @@ export default function Transcript() {
           throw new Error("Failed to fetch document");
         }
         const data = await response.json();
-        setBody(data.body);
-        setPatientName(data.patientName);
-        setCreatedTime(data.createdTime);
+        setBody(data.data.body);
+        setPatientName(data.data.name);
+        setCreatedTime(data.data.createdTime);
         setIsLoading(false);
+        console.log(data);
       } catch (err) {
         setError(err.message);
         setIsLoading(false);

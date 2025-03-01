@@ -20,7 +20,8 @@ export default function Summary() {
           throw new Error("Failed to fetch document");
         }
         const data = await response.json();
-        setBody(data.body);
+        console.log(data);
+        setBody(data.data.body);
         setPatientName(data.patientName);
         setCreatedTime(data.createdTime);
         setIsLoading(false);
