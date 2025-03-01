@@ -61,13 +61,31 @@ export default function DARP() {
     setData((prevData) => ({ ...prevData, [key]: value }));
   };
 
+
+    // Function to format date
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      return date
+        .toLocaleString("en-GB", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        })
+        .replace(/\//g, ".");
+    };
+  
+
   return (
     <div className="w-[375px] h-[667px] rounded-3xl border border-gray-200 bg-zinc-50 p-4 text-gray-900 flex flex-col overflow-auto">
       <div className="mb-4">
         <h1 className="font-handwriting text-4xl mb-1">{patientName}</h1>
         <div className="flex justify-between items-end">
           <h2 className="font-handwriting text-2xl">DARP</h2>
-          <span className="text-sm text-gray-500">{createdTime}</span>
+          <span className="text-sm text-gray-500">{formatDate(createdTime)}</span>
         </div>
       </div>
 

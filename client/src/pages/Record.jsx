@@ -4,18 +4,29 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useNavigate, Link } from "react-router-dom";
 import { Label } from "@/components/ui/label";
+
 import "./Record.css";
 
-function Record(){
-  const [selectedPatient, setSelectedPatient] = useState("Patient A");
+function Record() {
+  const [selectedPatient, setSelectedPatient] = useState({
+    id: 1,
+    name: "John Doe",
+  });
   const [consentGiven, setConsentGiven] = useState(false);
   const [recording, setRecording] = useState(false);
   const [patients, setPatients] = useState([]);
   const [audioURL, setAudioURL] = useState(null);
+  const [loading, setLoading] = useState(false);
   const mediaRecorder = useRef(null);
   const audioChunks = useRef([]);
+  // Refs for visualizers and animation
+  const recordingCanvasRef = useRef(null);
+  const playbackCanvasRef = useRef(null);
+  const animationIdRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const analyserRef = useRef(null);
 
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchPatients = async () => {
       try {
@@ -36,63 +47,50 @@ function Record(){
     fetchPatients();
   }, []);
 
-  const handleAddPatient = async () => {
-    setIsAddingPatient(false);
-    
-  };
-  
-
-  // Refs for visualizers and animation
-  const recordingCanvasRef = useRef(null);
-  const playbackCanvasRef = useRef(null);
-  const animationIdRef = useRef(null);
-  const audioContextRef = useRef(null);
-  const analyserRef = useRef(null);
-
   // Function to draw the live recording visualizer
   // Function to draw the live recording visualizer
-const drawRecordingVisualizer = () => {
-  const canvas = recordingCanvasRef.current;
-  const analyser = analyserRef.current;
-  if (!canvas || !analyser) return;
-  // Remove the line below so that fftSize remains as set in startRecording
-  // analyser.fftSize = 2048;
-  
-  const ctx = canvas.getContext("2d");
-  const bufferLength = analyser.fftSize;
-  const dataArray = new Uint8Array(bufferLength);
-  const WIDTH = canvas.width;
-  const HEIGHT = canvas.height;
+  const drawRecordingVisualizer = () => {
+    const canvas = recordingCanvasRef.current;
+    const analyser = analyserRef.current;
+    if (!canvas || !analyser) return;
+    // Remove the line below so that fftSize remains as set in startRecording
+    // analyser.fftSize = 2048;
 
-  const draw = () => {
-    animationIdRef.current = requestAnimationFrame(draw);
-    analyser.getByteTimeDomainData(dataArray);
+    const ctx = canvas.getContext("2d");
+    const bufferLength = analyser.fftSize;
+    const dataArray = new Uint8Array(bufferLength);
+    const WIDTH = canvas.width;
+    const HEIGHT = canvas.height;
 
-    // Clear canvas
-    ctx.fillStyle = "#f0f0f0";
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    const draw = () => {
+      animationIdRef.current = requestAnimationFrame(draw);
+      analyser.getByteTimeDomainData(dataArray);
 
-    // Draw waveform line
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "rgb(0, 0, 0)";
-    ctx.beginPath();
-    const sliceWidth = WIDTH / bufferLength;
-    let x = 0;
-    for (let i = 0; i < bufferLength; i++) {
-      const v = dataArray[i] / 128.0; // normalize to roughly [0, 2]
-      const y = (v * HEIGHT) / 2;
-      if (i === 0) {
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
+      // Clear canvas
+      ctx.fillStyle = "#f0f0f0";
+      ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+      // Draw waveform line
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "rgb(0, 0, 0)";
+      ctx.beginPath();
+      const sliceWidth = WIDTH / bufferLength;
+      let x = 0;
+      for (let i = 0; i < bufferLength; i++) {
+        const v = dataArray[i] / 128.0; // normalize to roughly [0, 2]
+        const y = (v * HEIGHT) / 2;
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+        x += sliceWidth;
       }
-      x += sliceWidth;
-    }
-    ctx.stroke();
-  };
+      ctx.stroke();
+    };
 
-  draw();
-};
+    draw();
+  };
 
   // Function to draw the playback waveform
   const drawPlaybackWaveform = (audioBuffer) => {
@@ -114,7 +112,7 @@ const drawRecordingVisualizer = () => {
       let min = 1.0;
       let max = -1.0;
       for (let j = 0; j < step; j++) {
-        const datum = data[(i * step) + j];
+        const datum = data[i * step + j];
         if (datum < min) min = datum;
         if (datum > max) max = datum;
       }
@@ -133,7 +131,8 @@ const drawRecordingVisualizer = () => {
 
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     // Live visualizer
-    audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+    audioContextRef.current = new (window.AudioContext ||
+      window.webkitAudioContext)();
     const source = audioContextRef.current.createMediaStreamSource(stream);
     const analyser = audioContextRef.current.createAnalyser();
     analyser.fftSize = 2048;
@@ -151,7 +150,9 @@ const drawRecordingVisualizer = () => {
       cancelAnimationFrame(animationIdRef.current);
       const audioBlob = new Blob(audioChunks.current, { type: "audio/wav" });
       audioChunks.current = [];
-      const audioFile = new File([audioBlob], "recording.wav", { type: "audio/wav" });
+      const audioFile = new File([audioBlob], "recording.wav", {
+        type: "audio/wav",
+      });
 
       // Convert to a URL for playback
       setAudioURL(URL.createObjectURL(audioBlob));
@@ -159,14 +160,16 @@ const drawRecordingVisualizer = () => {
       // Upload to backend
       const formData = new FormData();
       formData.append("file", audioFile);
-      formData.append("patient", selectedPatient);
-
-      await console.log(formData);
+      formData.append("patient", selectedPatient.name);
 
       await fetch("http://localhost:8080/api/transcript/transcribe", {
         method: "POST",
         body: formData,
       });
+
+      setLoading(false);
+      alert("Recording successfully completed!");
+      navigate(`/patient/${selectedPatient.id}`);
     };
 
     mediaRecorder.current.start();
@@ -177,16 +180,18 @@ const drawRecordingVisualizer = () => {
   const stopRecording = () => {
     mediaRecorder.current.stop();
     setRecording(false);
+    setLoading(true);
   };
 
   // When the audioURL is set, decode the audio and draw the waveform
   useEffect(() => {
-    if(audioURL) {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioURL) {
+      const audioContext = new (window.AudioContext ||
+        window.webkitAudioContext)();
       fetch(audioURL)
-        .then(response => response.arrayBuffer())
-        .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
-        .then(audioBuffer => {
+        .then((response) => response.arrayBuffer())
+        .then((arrayBuffer) => audioContext.decodeAudioData(arrayBuffer))
+        .then((audioBuffer) => {
           drawPlaybackWaveform(audioBuffer);
         });
     }
@@ -194,54 +199,69 @@ const drawRecordingVisualizer = () => {
 
   return (
     <div className="w-[375px] h-[667px] rounded-3xl border border-gray-200 bg-zinc-50 p-4 text-gray-900 overflow-hidden flex flex-col">
-      <div className="record-container">
-        <div className="record-box">
-          <label className="patient-label">Patient Concerns</label>
-          <select
-            value={selectedPatient}
-            onChange={(e) => setSelectedPatient(e.target.value)}
-          >
-            {patients.map((patient, index) => (
-              <option key={index} value={patient.name}>
-                {patient.name}
-              </option>
-            ))}
-          </select>
+      <label className="patient-label"></label>
 
+      <div className="mb-4">
+        <h1 className="font-handwriting text-4xl">Record Conversation</h1>
+      </div>
 
-          <div className="checkbox-container">
-            <label className="consent-text">I consent to my voice being recorded.</label>
+      <h2 className="font-handwriting text-xl">Select Patient</h2>
+      <select
+        className="border rounded-md border-zinc-500 p-2 text-xl"
+        value={selectedPatient.id}
+        onChange={(e) => {
+          const selected = patients.find(
+            (patient) => patient.id === parseInt(e.target.value)
+          );
+          if (selected) setSelectedPatient(selected);
+        }}
+      >
+        {patients.map((patient) => (
+          <option key={patient.id} value={patient.id}>
+            {patient.name}
+          </option>
+        ))}
+      </select>
+        <div className="checkbox-container m-4 flex flex-row items-center self-center">
+          <label className="consent-text text-sm font-bold">
+            I consent to my voice being recorded.
+          </label>
 
-            <input
-              type="checkbox"
-              id="consentCheckbox"
-              checked={consentGiven}
-              onChange={(e) => setConsentGiven(e.target.checked)}
-            />
-            <label htmlFor="consentCheckbox" className="toggle-switch"></label>
-          </div>
-
-          <button
-            onClick={recording ? stopRecording : startRecording}
-            className={`record-button ${recording ? "recording" : ""}`}
-          ></button>
-
-          {/* Audio playback and waveform */}
-          {audioURL && (
-            <>
-              <audio src={audioURL} controls className="audio-player"></audio>
-              <canvas
-                ref={playbackCanvasRef}
-                width="220"
-                height="80"
-                className="playback-waveform"
-              ></canvas>
-            </>
-          )}
+          <input
+            type="checkbox"
+            id="consentCheckbox"
+            checked={consentGiven}
+            onChange={(e) => setConsentGiven(e.target.checked)}
+          />
+          <label htmlFor="consentCheckbox" className="toggle-switch"></label>
         </div>
+      <div className=" flex flex-col  items-center justify-center h-full">
+
+        {loading ? (
+          <div className="mt-2 text-4xl text-gray-700">Transcribing...</div>
+        ) : (
+          <div>
+            <button
+              onClick={recording ? stopRecording : startRecording}
+              className={`h-[300px] w-[300px] record-button ${recording ? "recording" : ""}`}
+            ></button>
+            {/* Audio playback and waveform */}
+            {audioURL && (
+              <>
+                <audio src={audioURL} controls className="audio-player"></audio>
+                <canvas
+                  ref={playbackCanvasRef}
+                  width="220"
+                  height="80"
+                  className="playback-waveform"
+                ></canvas>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
-};
+}
 
 export default Record;

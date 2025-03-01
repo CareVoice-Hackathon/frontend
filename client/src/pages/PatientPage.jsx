@@ -25,7 +25,6 @@ export default function PatientPage() {
         setPatientName(innerData.patientName);
         documents.sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime)); // Sort documents by createdTime (newest first)
         setDocuments(documents);
-        console.log(innerData)
       } catch (err) {
         setError(err.message);
       } finally {
@@ -35,6 +34,22 @@ export default function PatientPage() {
 
     fetchDocuments();
   }, []);
+
+  // Function to format date
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date
+      .toLocaleString("en-GB", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      })
+      .replace(/\//g, ".");
+  };
 
   // Filter transcripts for batch processing
   const transcripts = documents.filter((doc) => doc.type === "Transcript");
@@ -47,7 +62,7 @@ export default function PatientPage() {
       HeadToToe: "head-to-toe",
       DARP: "darp",
     };
-    const route = typeMap[type] || "NA"; // Fallback to transcript
+    const route = typeMap[type] || "NA";
     return `/${route}/${encodeURIComponent(id)}`;
   };
 
@@ -57,15 +72,15 @@ export default function PatientPage() {
         <h1 className="font-handwriting text-4xl">{patientName}</h1>
       </div>
 
-        <h2 className="font-handwriting text-2xl mb-4 self-center">
-          Documents
-        </h2>
+      <h2 className="font-handwriting text-2xl mb-4 self-center">Documents</h2>
 
       <div className="flex flex-col h-full overflow-auto">
         {isLoading ? (
           <p className="text-gray-600 text-center">Loading documents...</p>
         ) : error ? (
           <p className="text-red-500 text-center">{error}</p>
+        ) : documents.length === 0 ? (
+          <p className="text-gray-600 text-xl text-center  ">This patient has no document</p>
         ) : (
           <div className="space-y-4 pl-2">
             {documents.map((doc) => (
@@ -75,7 +90,9 @@ export default function PatientPage() {
                 className="group cursor-pointer mb-2"
               >
                 <div className="font-handwriting text-xl">{doc.type}</div>
-                <div className="text-sm text-gray-400">{doc.createdTime}</div>
+                <div className="text-sm text-gray-400">
+                  {formatDate(doc.createdTime)}
+                </div>
                 <div className="mb-4 h-0.5 w-0 bg-zinc-500 transition-all duration-300 group-hover:w-full"></div>
               </Link>
             ))}
@@ -91,6 +108,16 @@ export default function PatientPage() {
         >
           Summarize or Generate Form
         </Button>
+      </div>
+
+      <div className="mt-2 flex justify-center">
+        <Link
+          to={`/record`}
+          className="border border-zinc-300 rounded-md  px-3 py-2 w-full text-center hover:bg-zinc-300 transition duration-200"
+
+        >
+          Record Conversation
+        </Link>
       </div>
 
       {/* Render modal only when isModalOpen is true */}

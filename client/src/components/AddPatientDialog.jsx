@@ -80,7 +80,7 @@ export default function AddPatientDialog({ onAdd, onCancel }) {
               value={healthNumber}
               onChange={(e) => setHealthNumber(e.target.value)}
               className="border-gray-300 bg-white text-gray-900 text-sm"
-              placeholder="xxx-xxx"
+              placeholder="Enter 9 digit AHN"
               required
             />
           </div>

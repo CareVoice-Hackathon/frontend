@@ -75,8 +75,6 @@ app.post("/convert-to-summary", async (req, res) => {
   }
 });
 
-
-
 app.post("/convert-to-darp", async (req, res) => {
   console.log(req.body);
   try {
@@ -95,68 +93,43 @@ app.post("/convert-to-darp", async (req, res) => {
     const patientId = req.body.patientId;
     const mergedText = transcriptBodies.join('\n');
 
-    const dMessage = "Summarize: \n\n" + mergedText;
-    const aMessage = "What action can be done to address the symptoms? \n\n" + mergedText;
-    const rMessage = "What action can be done to address the symptoms, and what would be the response? \n\n" + mergedText;
-    const pMessage = "what is the plan for addressing the symptom? \n\n" + mergedText;
-    console.log(patientId);
-    console.log(mergedText);
+    const prompts = [
+      { key: "data", message: "Summarize: \n\n" + mergedText },
+      { key: "action", message: "What action can be done to address the symptoms? \n\n" + mergedText },
+      { key: "response", message: "What action can be done to address the symptoms, and what would be the response? \n\n" + mergedText },
+      { key: "plan", message: "What is the plan for addressing the symptom? \n\n" + mergedText },
+    ];
 
-    const dResponse = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: dMessage }],
-      max_tokens: 1000,
-      temperature: 0.7,
-    });
+    // Run all ChatGPT requests concurrently
+    const responses = await Promise.all(
+      prompts.map(async (prompt) => {
+        const gptResponse = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [{ role: "user", content: prompt.message }],
+          max_tokens: 1000,
+          temperature: 0.7,
+        });
+        return { [prompt.key]: gptResponse.choices[0].message.content };
+      })
+    );
 
-    const aResponse = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: aMessage }],
-      max_tokens: 1000,
-      temperature: 0.7,
-    });
+    // Combine responses into a single object
+    const gptResponses = Object.assign({}, ...responses);
 
-    const rResponse = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: rMessage }],
-      max_tokens: 1000,
-      temperature: 0.7,
-    });
-
-    const pResponse = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: pMessage }],
-      max_tokens: 1000,
-      temperature: 0.7,
-    });
-
-    const gptDResponse = dResponse.choices[0].message.content;
-    const gptAResponse = aResponse.choices[0].message.content;
-    const gptRResponse = rResponse.choices[0].message.content;
-    const gptPResponse = pResponse.choices[0].message.content;
-
-
-    // Send GPT response to another server
+    // Send GPT responses to another server
     const summaryResponse = await fetch(`http://localhost:8080/api/DARP/patient/${patientId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        data: gptDResponse,
-        action: gptAResponse,
-        response: gptRResponse,
-        plan: gptPResponse,
-      }),
+      body: JSON.stringify(gptResponses),
     });
-    
-   
 
     if (!summaryResponse.ok) {
       throw new Error(`Failed to send summary for patient ${patientId}`);
     }
 
-    res.json({ message: "Summary successfully sent", summary: gptResponse });
+    res.json({ message: "Summary successfully sent", summary: gptResponses });
 
   } catch (error) {
     console.error("Error:", error);
@@ -164,6 +137,77 @@ app.post("/convert-to-darp", async (req, res) => {
   }
 });
 
+app.post("/convert-to-head-to-toe", async (req, res) => {
+  console.log(req.body);
+  try {
+    const transcriptBodies = await Promise.all(req.body.transcript_ids.map(async (id) => {
+      console.log(id);
+      const response = await fetch(`http://localhost:8080/api/transcript/${id}`);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch transcript with id ${id}`);
+      }
+
+      const data = await response.json();
+      return data.data.body;
+    }));
+
+    const patientId = req.body.patientId;
+    const mergedText = transcriptBodies.join('\n');
+
+    const promptRule = "Do not exceed three sentences. If there is no issue, say no symptom detected. \n\n"
+
+
+    const prompts = [
+      { key: "neurological", message: "highlight neurological of issue of a patient in text below." + promptRule+mergedText },
+      { key: "HEENT", message: "highlight issue with Head, Eyes, Ears, Nose, Throat in text below. " + promptRule+mergedText },
+      { key: "respiratory", message: "highlight respiratory of issue of a patient in text below." + promptRule+mergedText },
+      { key: "cardiac", message: "highlight cardiac of issue of a patient in text below." + promptRule+mergedText },
+      { key: "peripheral_Vascular", message: "highlight peripheral vascular of issue of a patient in text below." + promptRule+mergedText },
+      { key: "integumentary", message: "highlight integumentary of issue of a patient in text below." + promptRule+mergedText },
+      { key: "musculoskeletal", message: "highlight musculoskeletal of issue of a patient in text below." + promptRule+mergedText },
+      { key: "gastrointestinal", message: " highlight gastrointestinal of issue of a patient in text below." + promptRule+mergedText },
+      { key: "genitourinary", message: "highlight genitourinary of issue of a patient in text below." + promptRule+mergedText },
+      { key: "sleep_Rest", message: "highlight sleep of issue of a patient in text below." + promptRule+mergedText },
+      { key: "psychosocial", message: "highlight psychosocial of issue of a patient in text below." + promptRule+mergedText },
+    ];
+
+    // Run all ChatGPT requests concurrently
+    const responses = await Promise.all(
+      prompts.map(async (prompt) => {
+        const gptResponse = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [{ role: "user", content: prompt.message }],
+          max_tokens: 1000,
+          temperature: 0.7,
+        });
+        return { [prompt.key]: gptResponse.choices[0].message.content };
+      })
+    );
+
+    // Combine responses into a single object
+    const gptResponses = Object.assign({}, ...responses);
+
+    // Send GPT responses to another server
+    const summaryResponse = await fetch(`http://localhost:8080/api/head-to-toe/patient/${patientId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(gptResponses),
+    });
+
+    if (!summaryResponse.ok) {
+      throw new Error(`Failed to send summary for patient ${patientId}`);
+    }
+
+    res.json({ message: "Summary successfully sent", summary: gptResponses });
+
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
 
 
 
@@ -191,8 +235,6 @@ app.post("/chat", async (req, res) => {
     res.status(500).json({ error: "Something went wrong" });
   }
 });
-
-
 
 // GET endpoint for patients
 app.get("/patients", (req, res) => {

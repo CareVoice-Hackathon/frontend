@@ -38,7 +38,8 @@ export default function Landing() {
   return (
     <div className="w-[375px] h-[667px] rounded-3xl border border-gray-200 bg-zinc-50 p-4 text-gray-900 overflow-hidden flex flex-col">
       <div className="mb-4">
-        <h1 className="font-handwriting text-4xl">Welcome, Loryn</h1>
+        <h1 className="font-handwriting text-3xl">Welcome to CareVoice,</h1>
+        <h1 className="font-handwriting text-4xl ml-2">Loryn</h1>
       </div>
 
       <div className="mb-2 flex items-center justify-between">
@@ -59,7 +60,7 @@ export default function Landing() {
           <p className="text-red-500">{error}</p>
         ) : (
           <div className="space-y-4">
-            {patients.map((patient) => (
+            {patients.slice().reverse().map((patient) => (
               <Link
                 to={`/patient/${encodeURIComponent(patient.id)}`}
                 key={patient.id}
@@ -79,7 +80,8 @@ export default function Landing() {
       <div className="mt-4 flex justify-center">
         <Link
           to={`/record`}
-          className="border border-zinc-700 rounded-md px-2 py-1"
+          className="border border-zinc-700 rounded-md text-2xl px-3 py-3 hover:bg-zinc-300 transition duration-200"
+
         >
           Record Conversation
         </Link>
