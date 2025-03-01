@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -13,15 +11,41 @@ import {
 export default function AddPatientDialog({ onAdd, onCancel }) {
   const [name, setName] = useState("");
   const [healthNumber, setHealthNumber] = useState("");
+  const [dob, setDob] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (name.trim() && healthNumber.trim()) {
-      onAdd({
-        id: Date.now().toString(),
-        name,
-        healthNumber: `Alberta Health #: ${healthNumber}`,
+    if (!name.trim() || !healthNumber.trim() || !dob.trim()) return;
+    
+    const patientData = {
+      AHN: healthNumber,
+      name: name,
+      DOB: dob,
+    };
+    console.log(patientData);
+    setLoading(true);
+    try {
+      const response = await fetch("/api/patient", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(patientData),
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to add patient");
+      }
+
+      const result = await response.json();
+      onAdd(result);
+    } catch (error) {
+      console.error("Error adding patient:", error);
+    } finally {
+      setLoading(false);
+      window.location.reload();
+
     }
   };
 
@@ -56,7 +80,20 @@ export default function AddPatientDialog({ onAdd, onCancel }) {
               value={healthNumber}
               onChange={(e) => setHealthNumber(e.target.value)}
               className="border-gray-300 bg-white text-gray-900 text-sm"
-              placeholder="xxx-xxx"
+              placeholder="Enter 9 digit AHN"
+              required
+            />
+          </div>
+          <div className="space-y-1">
+            <label htmlFor="dob" className="block text-sm">
+              Date of Birth
+            </label>
+            <Input
+              id="dob"
+              type="date"
+              value={dob}
+              onChange={(e) => setDob(e.target.value)}
+              className="border-gray-300 bg-white text-gray-900 text-sm"
               required
             />
           </div>
@@ -66,14 +103,16 @@ export default function AddPatientDialog({ onAdd, onCancel }) {
               variant="outline"
               onClick={onCancel}
               className="border-gray-300 text-sm"
+              disabled={loading}
             >
               Cancel
             </Button>
             <Button
               type="submit"
               className="bg-blue-600 hover:bg-blue-700 text-white text-sm"
+              disabled={loading}
             >
-              Add Patient
+              {loading ? "Adding..." : "Add Patient"}
             </Button>
           </div>
         </form>

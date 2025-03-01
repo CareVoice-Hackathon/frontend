@@ -4,7 +4,8 @@ import { useNavigate, Link, useParams } from "react-router-dom";
 import FormSelectionDialog from "@/components/FormSelectionDialog";
 
 export default function HeadToToea() {
-  const { headToToeId } = useParams();
+  const { head_to_toeId } = useParams();
+  const [petientId, setPetinentId] = useState({});
   const [docType, setDocType] = useState("Summary");
   const [data, setData] = useState({});
   const [createdTime, setCreatedTime] = useState("");
@@ -15,19 +16,35 @@ export default function HeadToToea() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const sectionOrder = [
+    "neurological",
+    "HEENT",
+    "respiratory",
+    "cardiac",
+    "peripheral_Vascular",
+    "integumentary",
+    "musculoskeletal",
+    "gastrointestinal",
+    "genitourinary",
+    "sleep_Rest",
+    "psychosocial",
+  ];
+
   useEffect(() => {
     const fetchDocument = async () => {
       try {
-        const response = await fetch(`/api/head-to-toe/{headToToeId}`);
+        const response = await fetch(`/api/head-to-toe/${head_to_toeId}`);
         if (!response.ok) {
           throw new Error("Failed to fetch document");
         }
         const data = await response.json();
-        setData(data.body);
-        setPatientName(data.patientName);
-        setCreatedTime(data.createdTime);
-        setIsLoading(false);
         console.log(data);
+        setPetinentId(data.petientId);
+        setData(data.data.body);
+        setPatientName(data.data.patientName);
+        setCreatedTime(data.data.createdTime);
+        setIsLoading(false);
+        console.log(data.data);
       } catch (err) {
         setError(err.message);
         setIsLoading(false);
@@ -39,7 +56,7 @@ export default function HeadToToea() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`/api/head-to-toe/{headToToeId}`, {
+      const response = await fetch(`/api/head-to-toe/${head_to_toeId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -64,31 +81,47 @@ export default function HeadToToea() {
     setData((prevData) => ({ ...prevData, [key]: value }));
   };
 
+    // Function to format date
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      return date
+        .toLocaleString("en-GB", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        })
+        .replace(/\//g, ".");
+    };
+
   return (
     <div className="w-[375px] h-[667px] rounded-3xl border border-gray-200 bg-zinc-50  p-4 text-gray-900 overflow-hidden flex flex-col">
       <div className="mb-4">
         <h1 className="font-handwriting text-4xl mb-1">{patientName}</h1>
         <div className="flex justify-between items-end">
           <h2 className="font-handwriting text-xl">Head-to-toe Assessment</h2>
-          <span className="text-sm text-gray-500">{createdTime}</span>
+          <span className="text-sm text-gray-500">{formatDate(createdTime)}</span>
         </div>
       </div>
 
       <div className="DocBodyWrapper flex-grow mb-4 h-full overflow-auto">
-        {Object.entries(data).map(([key, value]) => (
-          <div key={key}>
-            <label className="block text-sm font-medium text-zinc-500">
-              {key
-                .replace(/_/g, " ")
-                .replace(/\b\w/, (char) => char.toUpperCase())}
-            </label>
-            <textarea
-              value={value}
-              onChange={(e) => handleInputChange(key, e.target.value)}
-              className=" p-2 mt-1 mb-4 w-[330px] block  rounded-md shadow-sm  focus:ring-opacity-50"
-              rows={5}
-            />
-          </div>
+        {sectionOrder.map((key) => (
+          data[key] !== undefined && (
+            <div key={key}>
+              <label className="block text-sm font-medium text-zinc-500">
+                {key.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())}
+              </label>
+              <textarea
+                value={data[key]}
+                onChange={(e) => handleInputChange(key, e.target.value)}
+                className="p-2 mt-1 mb-4 w-[330px] block rounded-md shadow-sm focus:ring-opacity-50"
+                rows={5}
+              />
+            </div>
+          )
         ))}
       </div>
 

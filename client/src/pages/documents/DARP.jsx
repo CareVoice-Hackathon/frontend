@@ -4,7 +4,8 @@ import { useNavigate, Link, useParams } from "react-router-dom";
 import FormSelectionDialog from "@/components/FormSelectionDialog";
 
 export default function DARP() {
-  const { DARP_id } = useParams();
+  const { DARP_Id } = useParams();
+  const [patientId, setPatientId] = useState({});
   const [docType, setDocType] = useState("Summary");
   const [data, setData] = useState({});
   const [createdTime, setCreatedTime] = useState("");
@@ -18,14 +19,16 @@ export default function DARP() {
   useEffect(() => {
     const fetchDocument = async () => {
       try {
-        const response = await fetch(`/api/DARP/${DARP_id}`);
+        console.log(DARP_Id)
+        const response = await fetch(`/api/DARP/${DARP_Id}`);
         if (!response.ok) {
           throw new Error("Failed to fetch document");
         }
         const data = await response.json();
-        setData(data.body);
-        setPatientName(data.patientName);
-        setCreatedTime(data.createdTime);
+        setPatientId(data.data.patientId);
+        setData(data.data.body);
+        setPatientName(data.data.patientName);
+        setCreatedTime(data.data.createdTime);
         setIsLoading(false);
       } catch (err) {
         setError(err.message);
@@ -38,7 +41,7 @@ export default function DARP() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`/api/DARP/{DARP_id}`, {
+      const response = await fetch(`/api/DARP/${DARP_Id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -58,13 +61,31 @@ export default function DARP() {
     setData((prevData) => ({ ...prevData, [key]: value }));
   };
 
+
+    // Function to format date
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      return date
+        .toLocaleString("en-GB", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        })
+        .replace(/\//g, ".");
+    };
+  
+
   return (
     <div className="w-[375px] h-[667px] rounded-3xl border border-gray-200 bg-zinc-50 p-4 text-gray-900 flex flex-col overflow-auto">
       <div className="mb-4">
         <h1 className="font-handwriting text-4xl mb-1">{patientName}</h1>
         <div className="flex justify-between items-end">
           <h2 className="font-handwriting text-2xl">DARP</h2>
-          <span className="text-sm text-gray-500">{createdTime}</span>
+          <span className="text-sm text-gray-500">{formatDate(createdTime)}</span>
         </div>
       </div>
 
