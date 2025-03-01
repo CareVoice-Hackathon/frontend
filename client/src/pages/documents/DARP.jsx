@@ -18,7 +18,7 @@ export default function DARP() {
   useEffect(() => {
     const fetchDocument = async () => {
       try {
-        const response = await fetch(`/api/DARP/{DARP_id}`);
+        const response = await fetch(`/api/DARP/${DARP_id}`);
         if (!response.ok) {
           throw new Error("Failed to fetch document");
         }
