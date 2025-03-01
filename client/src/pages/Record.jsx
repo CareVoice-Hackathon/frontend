@@ -166,7 +166,7 @@ const drawRecordingVisualizer = () => {
     <div className="w-[375px] h-[667px] rounded-3xl border border-gray-200 bg-zinc-50 p-4 text-gray-900 overflow-hidden flex flex-col">
       <div className="record-container">
         <div className="record-box">
-          <label>Patient</label>
+          <label className="patient-label">Patient Concerns</label>
           <select
             value={selectedPatient}
             onChange={(e) => setSelectedPatient(e.target.value)}
@@ -177,12 +177,15 @@ const drawRecordingVisualizer = () => {
           </select>
 
           <div className="checkbox-container">
+            <label className="consent-text">I consent to my voice being recorded.</label>
+
             <input
               type="checkbox"
+              id="consentCheckbox"
               checked={consentGiven}
               onChange={(e) => setConsentGiven(e.target.checked)}
             />
-            <label>I consent to my voice being recorded.</label>
+            <label htmlFor="consentCheckbox" className="toggle-switch"></label>
           </div>
 
           <button
