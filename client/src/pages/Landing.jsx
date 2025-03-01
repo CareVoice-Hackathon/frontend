@@ -12,12 +12,13 @@ export default function Landing() {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await fetch("/sandbox-api/patients");
+        const response = await fetch("/api/patients/1");
         if (!response.ok) {
           throw new Error("Failed to fetch patients");
         }
         const data = await response.json();
-        setPatients(data);
+        setPatients(data.data);
+        console.log(data.data);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -65,7 +66,7 @@ export default function Landing() {
               >
                 <div className="font-handwriting text-xl">{patient.name}</div>
                 <div className="ml-2 text-xs text-gray-500">
-                  AHN: {patient.AHN}
+                  AHN: {patient.ahsNumber}
                 </div>
                 <div className="h-0.5 w-0 bg-zinc-500 transition-all duration-300 group-hover:w-full"></div>
               </Link>
