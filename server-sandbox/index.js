@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 
-const PORT = 8080;
+const PORT = 8000;
 
 app.get("/patients", (req, res) => {
   const patients = [
@@ -31,7 +31,7 @@ app.get("/transcript/1", (req, res) => {
   });
 });
 
-app.get("/summary/1", (req, res) => {
+app.get("/summary/:id", (req, res) => {
   res.json({
     patientName: "Jae",
     createdTime: "2024-02-27 12:30:00",
@@ -39,7 +39,7 @@ app.get("/summary/1", (req, res) => {
   });
 });
 
-app.get("/head-to-toe/1", (req, res) => {
+app.get("/head-to-toe/:id", (req, res) => {
   res.json({
     patientName: "Loryn Sand",
     createdTime: "2024-02-27 13:00:00",
@@ -59,7 +59,7 @@ app.get("/head-to-toe/1", (req, res) => {
   });
 });
 
-app.get("/DARP/1", (req, res) => {
+app.get("/DARP/:id", (req, res) => {
   res.json({
     patientName: "Loryn Sand",
     createdTime: "2024-02-27 14:00:00",

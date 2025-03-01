@@ -12,7 +12,7 @@ export default function Landing() {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await fetch("/api/patients");
+        const response = await fetch("/sandbox-api/patients");
         if (!response.ok) {
           throw new Error("Failed to fetch patients");
         }

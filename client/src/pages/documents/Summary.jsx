@@ -4,7 +4,7 @@ import { useNavigate, Link, useParams } from "react-router-dom";
 import FormSelectionDialog from "@/components/FormSelectionDialog";
 
 export default function Summary() {
-  const { sumammaryId } = useParams();
+  const { summaryId } = useParams();
   const [body, setBody] = useState("");
   const [createdTime, setCreatedTime] = useState("");
   const [patientName, setPatientName] = useState("");
@@ -15,7 +15,7 @@ export default function Summary() {
   useEffect(() => {
     const fetchDocument = async () => {
       try {
-        const response = await fetch(`/api/summary/{sumammaryId}`);
+        const response = await fetch(`/api/summary/${summaryId}`);
         if (!response.ok) {
           throw new Error("Failed to fetch document");
         }

@@ -15,7 +15,7 @@ export default function Transcript() {
   useEffect(() => {
     const fetchDocument = async () => {
       try {
-        const response = await fetch(`/api/transcript/{transcriptId}`);
+        const response = await fetch(`/api/transcript/${transcriptId}`);
         if (!response.ok) {
           throw new Error("Failed to fetch document");
         }
