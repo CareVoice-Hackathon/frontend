@@ -4,7 +4,8 @@ import { useNavigate, Link, useParams } from "react-router-dom";
 import FormSelectionDialog from "@/components/FormSelectionDialog";
 
 export default function HeadToToea() {
-  const { headToToeId } = useParams();
+  const { head_to_toeId } = useParams();
+  const [petientId, setPetinentId] = useState({});
   const [docType, setDocType] = useState("Summary");
   const [data, setData] = useState({});
   const [createdTime, setCreatedTime] = useState("");
@@ -18,16 +19,17 @@ export default function HeadToToea() {
   useEffect(() => {
     const fetchDocument = async () => {
       try {
-        const response = await fetch(`/api/head-to-toe/{headToToeId}`);
+        const response = await fetch(`/api/head-to-toe/${head_to_toeId}`);
         if (!response.ok) {
           throw new Error("Failed to fetch document");
         }
         const data = await response.json();
-        setData(data.body);
-        setPatientName(data.patientName);
-        setCreatedTime(data.createdTime);
+        setPetinentId(data.petientId);
+        setData(data.data.body);
+        setPatientName(data.data.patientName);
+        setCreatedTime(data.data.createdTime);
         setIsLoading(false);
-        console.log(data);
+        console.log(data.data);
       } catch (err) {
         setError(err.message);
         setIsLoading(false);
@@ -39,7 +41,7 @@ export default function HeadToToea() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`/api/head-to-toe/{headToToeId}`, {
+      const response = await fetch(`/api/head-to-toe/${head_to_toeId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

@@ -20,7 +20,7 @@ function App() {
           <Route path="/patient/:patientId" element={<PatientPage />} />
           <Route path="/transcript/:transcriptId" element={<Transcript />} />
           <Route path="/summary/:summaryId" element={<Summary />} />
-          <Route path="/head-to-toe/:head-to-toeId" element={<HeadToToe />} />
+          <Route path="/head-to-toe/:head_to_toeId" element={<HeadToToe />} />
           <Route path="/DARP/:docId" element={<DARP />} />
         </Routes>
       </div>
