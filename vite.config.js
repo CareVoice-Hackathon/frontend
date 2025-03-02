@@ -17,12 +17,12 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:8080/api/", // The target server
+        target: "https://carevoicebackend-51a59399bb40.herokuapp.com/api/", // The target server
         changeOrigin: true, // Set this to true if you need to change the origin
         rewrite: (path) => path.replace(/^\/api/, ""), // Remove the base path from the request URL
       },
       "/sandbox-api": {
-        target: "http://localhost:8000", // The target server
+        target: "https://carevoicefrontendexpress-1b06bd543d5f.herokuapp.com", // The target server
         changeOrigin: true, // Set this to true if you need to change the origin
         rewrite: (path) => path.replace(/^\/sandbox-api/, ""), // Remove the base path from the request URL
       },
