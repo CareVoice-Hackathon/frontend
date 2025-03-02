@@ -42,8 +42,11 @@ app.post("/convert-to-summary", async (req, res) => {
     const mergedText = transcriptBodies.join('\n');
 
     const message = "Summarize into one paragraph:\n" + mergedText;
+    console.log("Patient Id:");
     console.log(patientId);
+    console.log("Merged Text:");
     console.log(mergedText);
+    
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",

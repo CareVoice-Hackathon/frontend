@@ -62,7 +62,7 @@ export default function Transcript() {
 
     const payload = {
       transcript_ids: [transcriptId],
-      patientId: patientId,
+      patientId: [patientId],
     };
 
     try {
